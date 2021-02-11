@@ -19,7 +19,7 @@ let pass = process.env.PASSWORD;
         await page.waitForNavigation({waitUntil: 'networkidle2'}),
     ])
     let partUrl = await page.evaluate(() => {
-        let link = document.querySelector('div[aria-label="Facebook"]>ul>li>span>div>a[aria-label="Більше"]')
+        let link = document.querySelector('div[aria-label="Facebook"]>ul>li>span>div>a[href="/bookmarks/"]')
         return link.getAttribute('href');
     });
     let newUrl = url.concat(partUrl);
@@ -33,7 +33,7 @@ let pass = process.env.PASSWORD;
     let user = await page.evaluate(() => {
         let title = document.querySelector('div[class="bi6gxh9e aov4n071"]>span[dir="auto"]>h1[class="gmql0nx0 l94mrbxd p1ri9a11 lzcic4wl bp9cbjyn j83agx80"][dir="auto"]');
         let name = title.textContent;
-        let img = document.querySelector('svg[aria-label="Дії з основною світлиною"]>g[mask="url(#jsc_c_i)"]>image');
+        let img = document.querySelector('svg[aria-label]>g[mask="url(#jsc_c_i)"]>image');
         const studySelector = 'div[data-pagelet="ProfileTilesFeed_0"] ul span'
         let placeOfStudy = document.querySelector(studySelector).textContent
 
