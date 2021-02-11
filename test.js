@@ -52,37 +52,42 @@ let pass = process.env.PASSWORD;
     let selector = 'div[data-pagelet="ProfileTimeline"] a[href^="' + urlPosts + '"]';
 
     await page.keyboard.press("Enter");
+    let length = 0
+    let timePosts;
+    while (length < 10) {
 
-    await  page.evaluate(async(selector)=>{
-        const delay = 3000;
-        const wait = (ms) => new Promise(res => setTimeout(res, ms));
-        const count = async () => document.querySelectorAll('div[data-pagelet="ProfileTimeline"]').length;
-        const scrollDown = async () => {
-            document.querySelector(selector)
-                .scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'center' });
-        }
-        let preCount = 0;
-        let postCount = 0;
-        do {
-            preCount = await count();
-            await scrollDown();
+        await page.evaluate(async (selector) => {
+            const delay = 3000;
+            const wait = (ms) => new Promise(res => setTimeout(res, ms));
+            const count = async () => document.querySelectorAll('div[data-pagelet="ProfileTimeline"]').length;
+            console.log(count)
+            const scrollDown = async () => {
+                document.querySelector('div[data-pagelet="ProfileTimeline"]:last-child')
+                    .scrollIntoView({behavior: 'smooth', block: 'end', inline: 'center'});
+            }
+            let preCount = 0;
+            let postCount = 0;
+            do {
+                preCount = await count();
+                await scrollDown();
+                await wait(delay);
+                postCount = await count();
+            } while (postCount > preCount);
             await wait(delay);
-            postCount = await count();
-        } while (postCount > preCount);
-        await wait(delay);
-    },selector)
+        }, selector)
 
-    let timePosts = await page.evaluate((selector) => {
-        let timeList = [];
-        let listPosts = document.querySelectorAll(selector)
-        listPosts.forEach(value => {
-            timeList.push(value.innerText);
-        })
-        return timeList;
+        timePosts = await page.evaluate((selector) => {
+            let timeList = [];
+            let listPosts = document.querySelectorAll(selector)
+            listPosts.forEach(value => {
+                timeList.push(value.innerText);
+            })
+            return timeList;
 
-    }, selector)
+        }, selector)
+        length = timePosts.length;
+    }
     console.log(timePosts);
-
     await browser.close()
 })()
 
