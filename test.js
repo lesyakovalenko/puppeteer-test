@@ -1,8 +1,10 @@
 const puppeteer = require('puppeteer');
 require('dotenv').config();
 let url = 'https://www.facebook.com';
+
 let email = process.env.EMAIL;
 let pass = process.env.PASSWORD;
+
 (async () => {
     const browser = await puppeteer.launch({headless: false,fullPage: true});
     const page = await browser.newPage();
@@ -27,6 +29,7 @@ let pass = process.env.PASSWORD;
         return link.getAttribute('href');
     });
     await page.goto(urlProfile, {waitUntil: 'networkidle2'});
+
     let user = await page.evaluate(() => {
         let title = document.querySelector('div[class="bi6gxh9e aov4n071"]>span[dir="auto"]>h1[class="gmql0nx0 l94mrbxd p1ri9a11 lzcic4wl bp9cbjyn j83agx80"][dir="auto"]');
         let name = title.textContent;
@@ -40,20 +43,22 @@ let pass = process.env.PASSWORD;
             placeOfStudy: placeOfStudy
         };
     })
+
     console.log(`full Name: ${user.name}`);
     console.log(`place of study: ${user.placeOfStudy}`);
     console.log(`image: ${user.imgUrl}`);
 
-
-
-    let timePosts = await page.evaluate(() => {
+    let timePosts = await page.evaluate((urlProfile) => {
         let timeList = [];
-        let listPosts = document.querySelectorAll('div[data-pagelet="ProfileTimeline"] a[href*="/posts/"]')
+
+        let urlPosts = String(urlProfile).concat('posts/');
+        let selector = 'div[data-pagelet="ProfileTimeline"] a[href^="'+urlPosts+'"]';
+        let listPosts = document.querySelectorAll(selector)
         listPosts.forEach(value => {
             timeList.push(value.innerText);
         })
         return timeList;
-    })
+    }, urlProfile)
     console.log(timePosts)
 
     // let timeNextPosts = await page.evaluate(() => {
@@ -65,5 +70,5 @@ let pass = process.env.PASSWORD;
     //     return timeNextList;
     // })
     //console.log(timeNextPosts)
-    await browser.close()
+    //await browser.close()
 })()
