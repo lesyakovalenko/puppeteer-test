@@ -55,8 +55,7 @@ let pass = process.env.PASSWORD;
     let length = 0
     let timePosts;
     while (length < 10) {
-
-        await page.evaluate(async (selector) => {
+        await page.evaluate(async () => {
             const delay = 3000;
             const wait = (ms) => new Promise(res => setTimeout(res, ms));
             const count = async () => document.querySelectorAll('div[data-pagelet="ProfileTimeline"]').length;
@@ -74,7 +73,7 @@ let pass = process.env.PASSWORD;
                 postCount = await count();
             } while (postCount > preCount);
             await wait(delay);
-        }, selector)
+        })
 
         timePosts = await page.evaluate((selector) => {
             let timeList = [];
