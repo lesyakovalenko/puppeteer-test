@@ -4,6 +4,7 @@ const url = 'https://www.facebook.com';
 let urlProfile = '';//TODO add url profile example 'https://www.facebook.com/your.link/'
 const email = process.env.EMAIL;
 const pass = process.env.PASSWORD;
+const friend = 'V'; //TODO input name friend
 (async () => {
     const browser = await puppeteer.launch({headless: false});
     let page = await browser.newPage();
@@ -120,15 +121,43 @@ const pass = process.env.PASSWORD;
         console.log(timePosts);
     }
 
+    async function findFriends() {
+        await page.keyboard.press("Enter");
+        await page.focus('input[type="search"]');
+
+        await page.keyboard.type(friend);
+        await new Promise(r => setTimeout(r, 2000));
+
+        let listFriend = await page.$$eval('div[role="listbox"] ul li[role="option"]', list => {
+            let resList = [];
+            let resLength = 0;
+            for (let i = 0; i < list.length; i++) {
+                let el = list[i];
+                if (el.querySelector('img[src]')) {
+                    let name = el.querySelector('a span').textContent;
+                    resList.push(name);
+                    resLength++;
+                }
+                if (resLength >= 5) {
+                    break;
+                }
+            }
+            return resList;
+        });
+        console.debug('List li', listFriend)
+        return listFriend;
+    }
+
     if (pass && email) {
         //TODO with credentials password and email
         await loginUser();
-        await getInfoForLoginUser()
+        await findFriends();
+        // await getInfoForLoginUser()
     } else {
         //TODO  if your logout but ...
-        await getInfoForLogoutUser();
+        // await getInfoForLogoutUser();
     }
-    await browser.close()
+    //await browser.close()
 })()
 
 
